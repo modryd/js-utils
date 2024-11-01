@@ -3,6 +3,7 @@ export default class BaseAction {
     static CONDITIONS_ATTRIBUTE = 'data-conditions';
     static PROPERTY_ATTRIBUTE = 'data-property';
     static DOMAIN_ATTRIBUTE = 'data-domain';
+    static ACTION_NAME = null;
     static NULL_TEXT = '_Click to edit_';
 
     setEndpoint(endpoint) {
@@ -42,7 +43,7 @@ export default class BaseAction {
         // Filter same domain
         return Array.from(elements).filter((element) => {
             const elementDomain = element.getAttribute(this.constructor.DOMAIN_ATTRIBUTE) || '';
-            return this.domain === elementDomain;
+            return (this.domain || '') === elementDomain;
         });
     }
 

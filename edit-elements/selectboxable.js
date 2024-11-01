@@ -143,7 +143,6 @@ export default class Selectboxable extends BaseAction {
                 continue;
             }
 
-            // Before edit keep original value
             element.onclick = (e) => this.fireEvent(e);
 
             if (element.innerHTML === '') {
