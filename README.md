@@ -3,6 +3,7 @@ Utils in JavaScript
 
 # edit-elements:
 
+```html
 <div data-domain="xxx">Value</div>
 <script type="module">
     (new Contenteditable("/update"))
@@ -10,7 +11,7 @@ Utils in JavaScript
       .setCSRFToken(csrf)
       .fire();
 </script>
-
+```
 
 ## Contenteditable
 

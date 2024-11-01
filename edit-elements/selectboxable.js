@@ -34,12 +34,18 @@ export default class Selectboxable extends BaseAction {
         .floating-select div:hover {
             background-color: #f0f0f0;
         }
+        [data-action="selectboxable"] {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+        }
         [data-action="selectboxable"]::after {
             content: ' ▼';
             font-size: 0.7em;
             color: #888;
         }
     `;
+    initialized = false;
 
     constructor(update_url, domain = '') {
         super();
@@ -129,15 +135,15 @@ export default class Selectboxable extends BaseAction {
 
     fire() {
         var elements = this.getElements();
-        this.addStyles();
+        if (!this.constructor.initialized) {
+            this.addStyles();
+            this.constructor.initialized = true;
+        }
         for (let element of elements) {
             if (!this.checkRequiredAttributes(element)) {
                 console.error(`Element missing required attributes: ${element.outerHTML}`, this.constructor.REQUIRED_ATTRIBUTES);
                 continue;
             }
-            // So we can position the selectbox absolute
-            element.style.position = 'relative';
-            element.style.display = 'inline-block';
 
             // Before edit keep original value
             element.onclick = (e) => this.fireEvent(e);
