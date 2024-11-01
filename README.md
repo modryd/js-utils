@@ -4,9 +4,10 @@ Utils in JavaScript
 # edit-elements:
 
 ```html
-<div data-domain="xxx">Value</div>
+<div contenteditable data-property="column" data-conditions="row_id:1" data-domain="xxx">Value</div>
 <script type="module">
-    (new Contenteditable("/update"))
+    (new Contenteditable())
+      .setEndpoint("/update")
       .setDomain("xxx")
       .setCSRFToken(csrf)
       .fire();

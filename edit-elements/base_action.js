@@ -5,6 +5,11 @@ export default class BaseAction {
     static DOMAIN_ATTRIBUTE = 'data-domain';
     static NULL_TEXT = '_Click to edit_';
 
+    setEndpoint(endpoint) {
+        this.endpoint = endpoint;
+        return this;
+    }
+
     setCSRFToken(token) {
         this.csrf = token;
         return this;
@@ -62,22 +67,24 @@ export default class BaseAction {
             }
         }
 
-        fetch(this.update_url, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({
-                attribute: attribute,
-                value: value,
-                ...additionalParams
+        if (this.endpoint) {
+            fetch(this.endpoint, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    attribute: attribute,
+                    value: value,
+                    ...additionalParams
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
     }
 
 

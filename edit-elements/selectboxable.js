@@ -47,12 +47,10 @@ export default class Selectboxable extends BaseAction {
     `;
     initialized = false;
 
-    constructor(update_url, domain = '') {
+    constructor() {
         super();
         this.originalValue = '';
         this.timeOut = null;
-        this.update_url = update_url;
-        this.domain = domain;
     }
 
     // On click, after timeout
