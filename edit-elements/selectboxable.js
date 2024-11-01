@@ -121,12 +121,6 @@ export default class Selectboxable extends BaseAction {
         return false;
     }
 
-    addStyles() {
-        let style = document.createElement('style');
-        style.innerHTML = this.constructor.STYLES;
-        document.head.appendChild(style);
-    }
-
     checkRequiredAttributes(element) {
         return this.constructor.REQUIRED_ATTRIBUTES.every((attr) => element.hasAttribute(attr));
     }
@@ -134,7 +128,7 @@ export default class Selectboxable extends BaseAction {
     fire() {
         var elements = this.getElements();
         if (!this.constructor.initialized) {
-            this.addStyles();
+            this.addStyles(this.constructor.STYLES);
             this.constructor.initialized = true;
         }
         for (let element of elements) {

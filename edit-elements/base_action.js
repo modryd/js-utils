@@ -21,6 +21,12 @@ export default class BaseAction {
         return this;
     }
 
+    addStyles(styles) {
+        let style = document.createElement('style');
+        style.innerHTML = styles;
+        document.head.appendChild(style);
+    }
+
     selectAllTextInNode(node) {
         if (!node) return;
         const range = document.createRange();
