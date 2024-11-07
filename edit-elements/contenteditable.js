@@ -5,7 +5,7 @@
  * <script type="module">
  *      import Contenteditable from 'contenteditable.js';
  *      const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
- *      (new Contenteditable("/update")).setCSRFToken(csrf).fire();
+ *      (new Contenteditable().setEndpoint("/update")).setCSRFToken(csrf).fire();
  * </script>
  */
 import BaseAction from './base_action.js';

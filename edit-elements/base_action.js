@@ -53,7 +53,7 @@ export default class BaseAction {
         });
     }
 
-    sendUpdate(attribute, value, element) {
+    getHeaders() {
         const headers = {
             'Content-Type': 'application/json'
         };
@@ -62,37 +62,69 @@ export default class BaseAction {
             headers['X-CSRF-TOKEN'] = this.csrf;
         }
 
-        const conditions = element.getAttribute(this.constructor.CONDITIONS_ATTRIBUTE);
-        let additionalParams = {};
-        if (conditions) {
-            try {
-                const json = '{' + conditions.replace(/(\w+):/g, '"$1":') + '}';
-                additionalParams = JSON.parse(json);
-            } catch (e) {
-                console.debug(`${this.constructor.CONDITIONS_ATTRIBUTE}:`, conditions);
-                console.error('Invalid JSON in data-conditions attribute:', e);
-            }
-        }
+        return headers;
+    }
 
-        if (this.endpoint) {
-            fetch(this.endpoint, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({
-                    attribute: attribute,
-                    value: value,
-                    ...additionalParams
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+    getAdditionalParams(element) {
+        let additionalParams = {};
+        const conditions = element.getAttribute(this.constructor.CONDITIONS_ATTRIBUTE);
+        if (!conditions) return additionalParams;
+
+        try {
+            const json = '{' + conditions.replace(/(\w+):/g, '"$1":') + '}';
+            additionalParams = JSON.parse(json);
+        } catch (e) {
+            console.debug(`${this.constructor.CONDITIONS_ATTRIBUTE}:`, conditions);
+            console.error('Invalid JSON in data-conditions attribute:', e);
         }
     }
 
+    sendUpdate(attribute, value, element) {
+        if (!this.endpoint) {
+            console.error('No endpoint set for:', element);
+            return;
+        }
+
+        fetch(this.endpoint, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({
+                attribute: attribute,
+                value: value,
+                ...this.getAdditionalParams(element)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    sendFile(file, element) {
+        if (!this.endpoint) {
+            console.error('No endpoint set for:', element);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+
+        let additionalParams = this.getAdditionalParams(element);
+        for (let key in additionalParams) {
+            formData.append(key, additionalParams[key]);
+        }
+
+        const headers = this.getHeaders();
+        delete headers['Content-Type'];
+
+        fetch(this.endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: formData,
+        })
+   }
 
 }

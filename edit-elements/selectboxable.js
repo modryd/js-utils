@@ -1,7 +1,7 @@
 // Selectboxable
 /**
  * Usage:
- * <h1 data-action="selectboxable" data-property="name" data-options="Yes,No">Select answer</h1>
+ * <h1 data-action="selectboxable" data-property="name" data-options="1,0" data-values="Yes,No">Select answer</h1>
  * <script type="module">
  *      import Selectboxable from 'selectboxable.js';
  *      (new Selectboxable("/update")).fire();
@@ -12,6 +12,7 @@ import BaseAction from "./base_action.js";
 export default class Selectboxable extends BaseAction {
     static ACTION_NAME = 'selectboxable';
     static OPTIONS_ATTRIBUTE = 'data-options';
+    static VALUES_ATTRIBUTE = 'data-values';
     static REQUIRED_ATTRIBUTES = [this.PROPERTY_ATTRIBUTE, this.OPTIONS_ATTRIBUTE];
     static STYLES = `
         .floating-select {
@@ -63,17 +64,27 @@ export default class Selectboxable extends BaseAction {
     renderSelectbox(element) {
         let div = document.createElement('div');
         div.classList.add('floating-select');
+        let values = {};
+        if (element.getAttribute(this.constructor.VALUES_ATTRIBUTE)) {
+            values = element.getAttribute(this.constructor.VALUES_ATTRIBUTE).split(',');
+        }
 
         let options = element.getAttribute(this.constructor.OPTIONS_ATTRIBUTE).split(',');
-        for (let option of options) {
+        let ix = 0;
+        for (let orig_option of options) {
+            let option = orig_option;
             let optionElement = document.createElement('div');
+            if (values[ix]) {
+                option = values[ix];
+            }
             optionElement.innerHTML = option;
-            optionElement.onclick = (e) => this.handleChange(element, e);
+            optionElement.onclick = (e) => this.handleChange(element, e, orig_option);
             // Downcased for comparison
             if (option.toLowerCase() === this.originalValue.toLowerCase()) {
                 optionElement.classList.add('selected');
             }
             div.appendChild(optionElement);
+            ix++;
         }
 
         element.innerHTML = '';
@@ -98,24 +109,29 @@ export default class Selectboxable extends BaseAction {
         document.onclick = null;
     }
 
-    handleChange(main, e) {
+    handleChange(main, e, value) {
         let option = e.target;
         option.classList.remove('active');
 
         let val = option.innerHTML;
+        let text = option.innerHTML;
         if (val === this.originalValue) return;
         if (this.originalValue === this.constructor.NULL_TEXT && val === '') {
-            option.innerHTML = this.constructor.NULL_TEXT;
+            text = this.constructor.NULL_TEXT;
             return;
         }
         let property = main.getAttribute(this.constructor.PROPERTY_ATTRIBUTE);
 
+        if (value) {
+            val = value;
+        }
+
         this.sendUpdate(property, val, main);
-        console.log(`Saving value of ${property} from ${this.originalValue} to ${val}`);
+        console.log(`Saving value of ${property} from ${this.originalValue} to ${text}`);
 
         // Update element text
         this.removeSelectbox(main);
-        main.innerHTML = val;
+        main.innerHTML = text;
 
         e.stopPropagation();
         return false;
@@ -123,6 +139,18 @@ export default class Selectboxable extends BaseAction {
 
     checkRequiredAttributes(element) {
         return this.constructor.REQUIRED_ATTRIBUTES.every((attr) => element.hasAttribute(attr));
+    }
+
+    setValue(element) {
+        let values = element.getAttribute(this.constructor.VALUES_ATTRIBUTE)?.split(',');
+        if (values) {
+            let options = element.getAttribute(this.constructor.OPTIONS_ATTRIBUTE)?.split(',');
+            let text = element.innerText.trim();
+            let ix = options.indexOf(text);
+            if (values[ix]) {
+                element.innerText = values[ix];
+            }
+        }
     }
 
     fire() {
@@ -138,6 +166,7 @@ export default class Selectboxable extends BaseAction {
             }
 
             element.onclick = (e) => this.fireEvent(e);
+            this.setValue(element);
 
             if (element.innerHTML === '') {
                 element.innerHTML = this.constructor.NULL_TEXT;

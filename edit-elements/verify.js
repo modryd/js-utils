@@ -52,6 +52,14 @@ export default class Verify extends BaseAction {
         }
     `;
     initialized = false;
+    lang_yes = 'Yes, agree';
+    lang_cancel = 'Cancel';
+
+    setTexts(yes, cancel) {
+        this.lang_yes = yes;
+        this.lang_cancel = cancel;
+        return this;
+    }
 
     fire() {
         if (!this.constructor.initialized) {
@@ -77,10 +85,10 @@ export default class Verify extends BaseAction {
         modal.innerHTML = `
             <div class="verify-modal-content">
                 <span class="verify-close verify-close-btn">&times;</span>
-                <h2>${msg}</h2>
+                <h2>${msg}?</h2>
                 <p>${description}</p>
-                <a href="${link}" class="btn btn-danger">Yes, agree</a>
-                <a class="btn btn-secondary verify-close-btn">Cancel</a>
+                <a href="${link}" class="btn btn-danger">${this.lang_yes}</a>
+                <a class="btn btn-secondary verify-close-btn">${this.lang_cancel}</a>
             </div>
         `;
         document.body.appendChild(modal);
